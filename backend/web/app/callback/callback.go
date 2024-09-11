@@ -37,12 +37,26 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 			return
 		}
 
+		// Extract email from the profile
+		email, ok := profile["email"].(string)
+		if !ok {
+			ctx.String(http.StatusInternalServerError, "Failed to get email from profile")
+			return
+		}
+
 		session.Set("access_token", token.AccessToken)
 		session.Set("profile", profile)
+		session.Set("email", email)
+
 		if err := session.Save(); err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
+
+		// TODO: create user in database
+		// user := models.User{
+		// 	Email: email,
+		// }
 
 		// Redirect to logged in page.
 		ctx.Redirect(http.StatusTemporaryRedirect, "/user")

@@ -11,6 +11,9 @@ import (
 func Handler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	profile := session.Get("profile")
+	email := session.Get("email")
+
+	// TODO: make custom session struct for user
 
 	if profile == nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -18,8 +21,9 @@ func Handler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
+		"id":      profile.(map[string]interface{})["sub"],
 		"name":    profile.(map[string]interface{})["name"],
-		"email":   profile.(map[string]interface{})["email"],
+		"email":   email,
 		"picture": profile.(map[string]interface{})["picture"],
 	})
 }
