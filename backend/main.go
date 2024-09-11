@@ -1,33 +1,29 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+
+	"01-Login/platform/authenticator"
+	"01-Login/platform/router"
 )
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
-	})
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Failed to load the env vars: %v", err)
+	}
 
-	r.HandleFunc("/code/{code}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		code := vars["code"]
+	auth, err := authenticator.New()
+	if err != nil {
+		log.Fatalf("Failed to initialize the authenticator: %v", err)
+	}
 
-		// TODO: Implement code validation and claiming logic
-		// This is a placeholder implementation
-		if code == "" {
-			http.Error(w, "Invalid code", http.StatusBadRequest)
-			return
-		}
+	rtr := router.New(auth)
 
-		// Simulate marking the code as claimed
-		// In a real implementation, you would update a database or storage
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Code " + code + " has been claimed"))
-	}).Methods("GET")
-
-	http.ListenAndServe(":8080", r)
+	log.Print("Server listening on http://localhost:3000/")
+	if err := http.ListenAndServe("0.0.0.0:3000", rtr); err != nil {
+		log.Fatalf("There was an error with the http server: %v", err)
+	}
 }
