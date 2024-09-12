@@ -7,11 +7,12 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 
-	"01-Login/platform/authenticator"
-	"01-Login/web/app/callback"
-	"01-Login/web/app/login"
-	"01-Login/web/app/logout"
-	"01-Login/web/app/user"
+	"bucks/platform/authenticator"
+	"bucks/platform/middleware"
+	"bucks/web/app/callback"
+	"bucks/web/app/login"
+	"bucks/web/app/logout"
+	"bucks/web/app/user"
 )
 
 // New registers the routes and returns the router.
@@ -31,7 +32,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.GET("/login", login.Handler(auth))
 	router.GET("/callback", callback.Handler(auth))
 	router.GET("/logout", logout.Handler)
-	router.GET("/user", user.Handler)
+	router.GET("/user", middleware.UserMiddleware, user.Handler)
 
 	// router.GET("/test", middleware.IsAuthenticated, func(c *gin.Context) {
 	// 	c.Status(200)

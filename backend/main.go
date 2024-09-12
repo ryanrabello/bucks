@@ -6,8 +6,9 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"01-Login/platform/authenticator"
-	"01-Login/platform/router"
+	"bucks/database"
+	"bucks/platform/authenticator"
+	"bucks/platform/router"
 )
 
 func main() {
@@ -18,6 +19,11 @@ func main() {
 	auth, err := authenticator.New()
 	if err != nil {
 		log.Fatalf("Failed to initialize the authenticator: %v", err)
+	}
+
+	err = database.InitDatabase()
+	if err != nil {
+		log.Fatalf("Failed to initialize the database: %v", err)
 	}
 
 	rtr := router.New(auth)

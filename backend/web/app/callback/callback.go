@@ -6,7 +6,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
-	"01-Login/platform/authenticator"
+	"bucks/database"
+	"bucks/platform/authenticator"
 )
 
 // Handler for our callback.
@@ -44,19 +45,33 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 			return
 		}
 
+		// Check if the user already exists
+		var user database.User
+		database.DB.Where("idp_type = ? AND idp_user_id = ?", "auth0", idToken.Subject).First(&user)
+
+		if user.ID == 0 {
+			// User doesn't exist, create a new user
+			user = database.User{
+				Name:           profile["name"].(string),
+				Email:          email,
+				IDPUserId:      idToken.Subject,
+				IDPType:        "auth0",
+				ProfilePicture: profile["picture"].(string),
+			}
+
+			if err := database.DB.Create(&user).Error; err != nil {
+				ctx.String(http.StatusInternalServerError, "Failed to create new user")
+				return
+			}
+		}
+
 		session.Set("access_token", token.AccessToken)
-		session.Set("profile", profile)
-		session.Set("email", email)
+		session.Set("userId", user.ID)
 
 		if err := session.Save(); err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
-
-		// TODO: create user in database
-		// user := models.User{
-		// 	Email: email,
-		// }
 
 		// Redirect to logged in page.
 		ctx.Redirect(http.StatusTemporaryRedirect, "/user")
