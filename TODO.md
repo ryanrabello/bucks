@@ -1,3 +1,4 @@
+- Separate the controller from the handler? In callback.go?
 - Create other models
   - Transaction
     - Sender FK (User)

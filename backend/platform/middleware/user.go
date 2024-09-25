@@ -14,13 +14,16 @@ func UserMiddleware(ctx *gin.Context) {
 	userId := sessions.Default(ctx).Get("userId")
 
 	if userId == nil {
-		ctx.Redirect(http.StatusSeeOther, "/")
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
 	}
 
 	var user database.User
 	tx := database.DB.First(&user, userId)
+
 	if tx.Error != nil {
-		ctx.Redirect(http.StatusSeeOther, "/")
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
 	}
 
 	ctx.Set("user", user)
