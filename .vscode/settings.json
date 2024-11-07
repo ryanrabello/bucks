@@ -2,5 +2,10 @@
     "cSpell.words": [
         "gonic",
         "gorm"
-    ]
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#F28B50",
+        "titleBar.activeBackground": "#F9C7AA",
+        "titleBar.activeForeground": "#2C1203"
+    }
 }

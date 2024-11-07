@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"bucks/platform/authenticator"
+	"bucks/platform/invitation"
 	"bucks/platform/middleware"
 	"bucks/web/app/callback"
 	"bucks/web/app/login"
@@ -33,6 +34,8 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.GET("/callback", callback.Handler(auth))
 	router.GET("/logout", logout.Handler)
 	router.GET("/user", middleware.UserMiddleware, user.Handler)
+
+	router.POST("/invitation-code", middleware.UserMiddleware, invitation.Handler)
 
 	// router.GET("/test", middleware.IsAuthenticated, func(c *gin.Context) {
 	// 	c.Status(200)
